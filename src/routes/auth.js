@@ -6,7 +6,7 @@ const jwt = require("jsonwebtoken");
 // Register
 router.post("/register", async (req, res) => {
   const newUser = new User({
-    username: req.body.username,
+    username: req.body.userName,
     email: req.body.email,
     password: CryptoJS.AES.encrypt(req.body.password, process.env.Secret),
   });
@@ -23,16 +23,16 @@ router.post("/register", async (req, res) => {
 router.post("/login", async (req, res) => {
   try {
     const user = await User.findOne({
-      username: req.body.username,
+      username: req.body.data.username,
     });
-    !user && res.status(500).json("Wrong Credentials!");
+    if (!user) return res.status(500).json("Wrong Credentials!");
     const hashPassword = CryptoJS.AES.decrypt(
       user.password,
       process.env.Secret
     );
     const OriginalPassword = hashPassword.toString(CryptoJS.enc.Utf8);
-    OriginalPassword !== req.body.password &&
-      res.status(500).json("Wrong Credentials!");
+    if (OriginalPassword !== req.body.data.password)
+      return res.status(500).json("Wrong Credentials!");
     const { password, ...others } = user._doc;
     const accessToken = jwt.sign(
       {
