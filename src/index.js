@@ -1,9 +1,11 @@
 const app = require("./app");
-const serverless = require("serverless-http");
-const express = require("express");
-const router = express.Router();
-app.use("/.netlify/functions/api", router);
-app.listen(process.env.PORT || 5000, () => {
-  console.log("Backend server is running!");
+const http = require("http");
+const hostname = "0.0.0.0";
+const server = http.createServer(app, (req, res) => {
+  res.statusCode = 200;
+  res.setHeader("Content-Type", "text/plain");
+  res.end("zeet Node!");
 });
-module.exports.handler = serverless(app);
+server.listen(process.env.PORT || 5000, hostname, () => {
+  console.log("Backend server is running!" + `http://${hostname}:${5000}`);
+});
